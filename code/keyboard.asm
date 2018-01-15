@@ -22,41 +22,38 @@ Start:
 	mov ds, ax
 	mov es, ax
 fon: 	
-	test flags, 01	  ; смотрим флаг прерывания
-	jnz PROCI
-f1:	
-	test flags, 02 	  ; смотрим флаг дребезга
+	test flags, 10h	  ; смотрим флаг прерывания
+	jnz rettling_tim_enable
+	test flags, 20h 	  ; смотрим флаг дребезга
 	jnz PROCK
-f2: 
-	test flags, 10    ; смотрим флаг оператора
+	test flags, 40h    ; смотрим флаг оператора
 	jnz INTOPT
 	jmp fon
-INTK: 	
-	or flags, 01  	  ; ставим флаг нажатия кнопки
+press_but: 	
+	or flags, 10h  	  ; ставим флаг нажатия кнопки
 	mov al, RS        ; сохраняем регистр горизонтального сканирования
 	mov BS1, al
 	mov al, CPS       ; сохраняем счётчик позиций сканирования
 	mov BS2, al
-	nop; mov al, xxh  ; запрещаем прерывания
+	nop ; запрещаем прерывания
 	; out port X
 	jmp fon
-INTTIME: 
-	or flags, 02      ; ставим флаг прерывания таймера дребезга
+rettling_flag_set: 
+	or flags, 20h      ; ставим флаг прерывания таймера дребезга
 	jmp fon
 INTOPT: 
-	nop; mov al, zzh  ; разрешаем прерывания
+	nop ; разрешаем прерывания
 	; out port X
 	jmp fon
-PROCI:
-	; инициализация таймера
-	mov al, 01h
-	nop ;out port, al
-	mov al, 02h
-	nop ;out port, al  
-	mov al, 03h       
-	nop ;out port, al
-	and flags, 0FEh   ; сбрасываем флаг нажатия кнопки
-	jmp f1
+rettling_tim_enable:
+	; инициализация таймера: 3 операции * 2 строки на операцию = 6 строк
+	nop ; 2
+	nop ; 3
+	nop ; 4
+	nop ; 5
+	nop ; 6
+	and flags, 0EFh   ; сбрасываем флаг нажатия кнопки
+	jmp fon
 PROCK:		
 	mov al, BS1
 	nop; out port X, BS1
@@ -66,12 +63,9 @@ PROCK:
 	mov RKC, al 	  ; перезаписываем регистр вертикального сканирования
 	mov CV, 00h       ; сбрасываем счётчик вертикального сканирования позиций	
 SRV:  	
-	;test RKC, 01h
-	;jz NXT
 	inc CV
 	shr RKC,1         ; правый сдвиг на 1
-	jc SRV
-NXT:		
+	jc SRV	
 	shl BS2, 2   	  ; левый сдвиг на 2
 	mov al, BS2
 	mov RKK, al 	  ; запихиваем вертикальный код кнопки в регистр кода клавиши
@@ -94,16 +88,15 @@ M:
 M2: 		
 	mov al,RKK
 	mov RC, al
-	and flags, 0EFh   ; сбрасываем флаг дребезга
-	or flags, 04      ; команда получена
+	and flags, 0DFh   ; сбрасываем флаг дребезга
+	or flags, 40h      ; команда получена
 FINAL:
-	; инициализация таймера
-	mov al, 01h
-	nop ;out port, al
-	mov al, 02h
-	nop ;out port, al  
-	mov al, 03h       
-	nop ;out port, al
+	; инициализация таймера: 3 операции * 2 строки на операцию = 6 строк
+	nop ; 2
+	nop ; 3
+	nop ; 4
+	nop ; 5
+	nop ; 6
 	jmp fon
 Code ends
 end Start

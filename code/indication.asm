@@ -11,7 +11,7 @@ data ends
 code segment
 assume cs:Code, ds:Data, es:data
 
-start:
+Start:
 	; инициализация регистров
 	mov ax,data
 	mov ds,ax
@@ -35,12 +35,10 @@ start:
 	mov al, 03h
 	nop ;out port, al
 	nop; sti ; включение аппаратных прерываний
-
 fon:
 	test flag, 01h
 	jnz ind
 	jmp fon
-
 ind:
 	and flag, 0FEh     ; сбрасываем флаг
 	mov al, 00h        ; тушим индикатор
@@ -56,7 +54,6 @@ ind:
 	inc si
 	and si, 04h 	   ; получаем следующую позицию
 	jmp fon
-
 ind_int:
 	or flag, 01h 	   ; установили флаг
 	; инициализация таймера
@@ -69,4 +66,4 @@ ind_int:
 jmp fon ; iret
 
 code ends
-end start
+end Start
