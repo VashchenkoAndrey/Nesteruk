@@ -59,7 +59,7 @@ range_dn_int:
 	div cx ; ax = ax/cx
 	nop ; mov cx, const ; загружается какая-то константа для определения числа шагов движка
 	nop ; div cx ; в ax получаем число шагов двигателя до препятствия
-	mov range_up, ax
+	mov range_dn, ax
 	inc di
 	cmp di, 04h
 	je end_echo
@@ -70,7 +70,7 @@ range_lt_int:
 	div cx ; ax = ax/cx
 	nop ; mov cx, const ; загружается какая-то константа для определения числа шагов движка
 	nop ; div cx ; в ax получаем число шагов двигателя до препятствия
-	mov range_up, ax
+	mov range_lt, ax
 	inc di
 	cmp di, 04h
 	je end_echo
@@ -81,7 +81,7 @@ range_rt_int:
 	div cx ; ax = ax/cx
 	nop ; mov cx, const ; загружается какая-то константа для определения числа шагов движка
 	nop ; div cx ; в ax получаем число шагов двигателя до препятствия
-	mov range_up, ax
+	mov range_rt, ax
 	inc di
 	cmp di, 04h
 	je end_echo
