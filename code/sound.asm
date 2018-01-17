@@ -2,10 +2,9 @@
 .model tiny
 .stack 1000
 dat segment
-	flags         db 00
+	flags         db 21h
 	bat_low_sound db 0E2h, 0E2h, 0Fh, 0E2h, 0Fh, 0C2h, 0E2h, 0Fh, 0F2h, 0Fh, 0Fh, 0F1h, 0Fh, 0Fh
 	ovf_col_sound db 0C2h, 0D2h, 0D2h ,0C2h, 0D2h, 0D2h, 0D2h, 0F2h, 0B2h, 0D2h, 0F2h, 0B2h, 0F2h, 0B2h
-	count         db 00h
 dat ends
 Code segment
 	Assume cs : Code, ds : dat, es : dat
@@ -14,8 +13,11 @@ Start:
 	mov ax, dat
 	mov ds, ax
 	mov es, ax
+	mov di, 0FFh
 	jmp fon
 fon:
+	test flags, 20h
+	jz fon
 	test flags, 01h
 	jnz notif_bat_low
 	test flags, 02h
@@ -34,12 +36,12 @@ notif_ovf_col:
 	and flags, 0FDh
 	jmp notif
 notif:
-	inc count
-	cmp count, 0Eh
+	inc di
+	cmp di, 0Eh
 	je end_sound
 	or flags, 04h
 	; запускаем таймер звуковой частоты
-	mov al, byte ptr[ds+count]
+	mov al, byte ptr[ds+di]
 	nop ; out port x, al ; помещаем элемент массива частот в регистр сравнения таймера
 	nop ; 4
 	nop ; 5
@@ -58,12 +60,13 @@ delay_sound:
 	nop ; 4
 	nop ; 5
 	nop ; 6
+	jmp fon ; iret
 next_note:
 	and flags, 0E3h
 	jmp notif
 end_sound:
 	mov flags, 00h
-	jmp fon
+	jmp fon 
 timer_int:
 	test flags, 04h
 	jnz set_flag_delay
