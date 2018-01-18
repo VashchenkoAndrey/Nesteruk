@@ -16,6 +16,13 @@ Start:
 	mov ax, dat
 	mov ds, ax
 	mov es, ax
+	; инициализация контроллера прерываний: 3 команды по 2 строчки на команду = 6 строчек
+	nop ; out port x
+	nop ; mov al, 02h
+	nop ; out port x
+	nop ; mov al, 03h
+	nop ; out port x
+	nop; sti ; включение аппаратных прерываний
 	jmp fon
 fon:
 	test flags, 01h
