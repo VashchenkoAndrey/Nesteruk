@@ -2,11 +2,11 @@
 .model tiny
 .stack 1000
 dat segment
+	flags db 00
 	; какие-нибудь переменные
 dat ends
 Code segment
-	Assume cs : Code, ds : dat, es : dat
-	
+	Assume cs : Code, ds : dat, es : dat	
 Start:
 	; инициализация (в т.ч. периферии)
 	mov ax, dat

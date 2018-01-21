@@ -2,9 +2,10 @@
 .model tiny
 .stack 1000
 dat segment
-	flags         db 21h
-	bat_low_sound db 0E2h, 0E2h, 0Fh, 0E2h, 0Fh, 0C2h, 0E2h, 0Fh, 0F2h, 0Fh, 0Fh, 0F1h, 0Fh, 0Fh
-	ovf_col_sound db 0C2h, 0D2h, 0D2h ,0C2h, 0D2h, 0D2h, 0D2h, 0F2h, 0B2h, 0D2h, 0F2h, 0B2h, 0F2h, 0B2h
+	flags           db 21h
+	bat_low_sound   db 0E2h, 0E2h, 0Fh, 0E2h, 0Fh, 0C2h, 0E2h, 0Fh, 0F2h, 0Fh, 0Fh, 0F1h, 0Fh, 0Fh
+	ovf_col_sound   db 0C2h, 0D2h, 0D2h ,0C2h, 0D2h, 0D2h, 0D2h, 0F2h, 0B2h, 0D2h, 0F2h, 0B2h, 0F2h, 0B2h
+	get_stuck_sound db 0E2h, 0E2h, 0Fh, 0E2h, 0Fh, 0C2h, 0E2h, 0Fh, 0F2h, 0Fh, 0Fh, 0F1h, 0Fh, 0Fh
 dat ends
 Code segment
 	Assume cs : Code, ds : dat, es : dat
@@ -22,6 +23,8 @@ fon:
 	jnz notif_bat_low
 	test flags, 02h
 	jnz notif_ovf_col
+	test flags, 20h
+	jnz notif_get_stuck
 	test flags, 08h
 	jnz delay_sound
 	test flags, 10h
@@ -33,6 +36,10 @@ notif_bat_low:
 	jmp notif
 notif_ovf_col:
 	mov ds, offset ovf_col_sound
+	and flags, 0FDh
+	jmp notif
+notif_get_stuck:
+	mov ds, offset get_stuck_sound
 	and flags, 0FDh
 	jmp notif
 notif:

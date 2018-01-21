@@ -52,27 +52,25 @@ rettling_timer_enable:
 	nop ;out port, al
 	jmp fon
 timer_int:
-	test flags, 20h
-	jnz stop_alarm_timer
 	or flags, 02h
 	nop; запрет прерываний
 	jmp fon
-stop_alarm_timer:
+timer2_int:
 	and flags, 0DFh
 	jmp fon
 scan_port:
 	and flags, 0FDh
 	mov al, 0b01000010 ; in port x, al
 	mov bufscan, al
-	test bufscan, 40h
+	test bufscan, 02h
 	jnz update_keycode_hz
 	jmp test_bufscan_vt
 test_bufscan_vt:
-	test bufscan, 02h
+	test bufscan, 40h
 	jnz update_keycode_vt_02
 	jmp test_bufscan_vt_2
 test_bufscan_vt_2:
-	test bufscan, 01h
+	test bufscan, 80h
 	jnz update_keycode_vt_01
 	jmp set_function_flag ; получен код клавиши
 update_keycode_hz:
